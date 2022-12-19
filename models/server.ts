@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import cors from "cors";
 import authRoutes from "../routes/auth.routes";
+import database from "../database/connection";
 
 class Server {
 
@@ -13,9 +14,22 @@ class Server {
 
         this.middlewares();
         this.routes();
+
+        this.dbConecction();
     }
 
-    //TODO: conexión con base de datos
+    //Conexión con la base de datos
+    async dbConecction() {
+
+        try {
+
+            database.authenticate();
+            
+        } catch (error) {
+            console.log(error);          
+        }
+
+    }
 
     middlewares() {
         //CORS
