@@ -1,4 +1,6 @@
 import express, { Application } from "express";
+import cors from "cors";
+import authRoutes from "../routes/auth.routes";
 
 class Server {
 
@@ -8,6 +10,24 @@ class Server {
     constructor(){
         this.app = express();
         this.port = process.env.PORT || '8080';
+
+        this.middlewares();
+        this.routes();
+    }
+
+    //TODO: conexión con base de datos
+
+    middlewares() {
+        //CORS
+        this.app.use( cors() );
+
+        //Lecura del Body
+        this.app.use( express.json() );
+    }
+
+    routes() {
+        //Rutas de la aplicación
+        this.app.use('/auth', authRoutes );
     }
 
     listen(){
