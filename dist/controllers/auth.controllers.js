@@ -80,8 +80,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             role
         });
         return res.json({
-            msg: 'Usuario creado correctamente',
-            user
+            msg: 'Usuario creado correctamente'
         });
     }
     catch (error) {

@@ -90,8 +90,7 @@ export const registerUser = async (req: Request, res: Response): Promise<Respons
         });
 
         return res.json({
-            msg: 'Usuario creado correctamente',
-            user
+            msg: 'Usuario creado correctamente'
         })
         
     } catch (error) {
