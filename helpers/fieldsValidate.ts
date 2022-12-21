@@ -8,7 +8,9 @@ const fieldsValidate = (req: Request, res: Response, next: NextFunction) => {
 
     if(!errors.isEmpty()) {
 
-        return res.status(400).json(errors);
+        return res.status(400).json({
+            msg: errors.array()[0].msg
+        });
     }
 
     next();
