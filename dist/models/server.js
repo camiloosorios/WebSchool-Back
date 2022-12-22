@@ -23,6 +23,7 @@ class Server {
         this.middlewares();
         this.routes();
         this.dbConecction();
+        // sendEmail();
     }
     //Conexión con la base de datos
     dbConecction() {

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcryptjs from "bcryptjs";
 
 import User from '../models/user';
+import sendEmail from "../helpers/sendEmail";
 
 
 export const loginUser = async (req: Request, res: Response): Promise<Response> => {
@@ -88,6 +89,8 @@ export const registerUser = async (req: Request, res: Response): Promise<Respons
             password: passEncripted,
             role
         });
+
+        sendEmail(name, email);
 
         return res.json({
             msg: 'Usuario creado correctamente'

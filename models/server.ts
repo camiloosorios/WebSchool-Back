@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import cors from "cors";
 import authRoutes from "../routes/auth.routes";
 import database from "../database/connection";
+import sendEmail from "../helpers/sendEmail";
 
 class Server {
 
@@ -16,6 +17,8 @@ class Server {
         this.routes();
 
         this.dbConecction();
+
+        // sendEmail();
     }
 
     //Conexión con la base de datos

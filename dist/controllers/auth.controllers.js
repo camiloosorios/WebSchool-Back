@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.renewPassword = exports.registerUser = exports.loginUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_1 = __importDefault(require("../models/user"));
+const sendEmail_1 = __importDefault(require("../helpers/sendEmail"));
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //Desestructuramos el correo y contraseña del body
     const { email, password } = req.body;
@@ -79,6 +80,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             password: passEncripted,
             role
         });
+        (0, sendEmail_1.default)(name, email);
         return res.json({
             msg: 'Usuario creado correctamente'
         });
