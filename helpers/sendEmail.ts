@@ -8,7 +8,7 @@ const sendMail = (name: string, email: string) => {
         secure: true,
         auth:  {
             type: 'OAuth2',
-            user: 'webschoolauth@gmail.com',
+            user: process.env.USER,
             clientId: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
             refreshToken: process.env.REFRESH_TOKEN,
@@ -22,14 +22,6 @@ const sendMail = (name: string, email: string) => {
       html: emailTemplate(name)
     });
 
-    // transporter.set("oauth2_provision_cb", (user, renew, callback) => {
-    //     let accessToken = process.env.ACCESS_TOKEN;
-    //     if (!accessToken) {
-    //       return callback(new Error("Unknown user"));
-    //     } else {
-    //       return callback(null, accessToken);
-    //     }
-    //   });
     
 }
 
