@@ -1,13 +1,14 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import bcryptjs from "bcryptjs";
 
 import User from '../models/user';
 import sendEmail from "../helpers/sendEmail";
 import generateToken from "../helpers/jwtGenerate";
 import { JsonWebTokenPayload } from '../interfaces/jwt.interface';
+import { RequestJwt } from "../interfaces/request.interface";
 
 
-export const loginUser = async (req: Request, res: Response): Promise<Response> => {
+export const loginUser = async (req: RequestJwt, res: Response): Promise<Response> => {
 
     //Desestructuramos el correo y contraseña del body
     const { email, password } = req.body;
@@ -66,7 +67,7 @@ export const loginUser = async (req: Request, res: Response): Promise<Response> 
 
 }
 
-export const registerUser = async (req: Request, res: Response): Promise<Response> => {
+export const registerUser = async (req: RequestJwt, res: Response): Promise<Response> => {
 
     //Extraemos los datos desde el body
     const { name, email, password, role } = req.body;
@@ -130,18 +131,32 @@ export const registerUser = async (req: Request, res: Response): Promise<Respons
 
 }
 
-export const emailConfirmation = (req: Request, res: Response) => {
-    const { token } = req.query;
+export const renewToken = (req: RequestJwt, res: Response) => {
 
-    console.log(token);
-    
-
-    return res.json({
-        token
-    })
 }
 
-export const renewPassword = async (req: Request, res: Response): Promise<void> => {
+export const emailConfirmation = async(req: RequestJwt, res: Response) => {
+    
+    //obtenemos el id del usuario
+    const id = req.id;
+    
+    //Obtenemos el usuario a actualizar
+    const user = await User.findByPk(id);
+ 
+    if(user) {
+
+        //Actualizamos el estado a verificado
+        user.set('verified', true);
+        await user.save();
+    
+        return res.json({
+            msg: 'Cuenta Verificada'
+        });
+    }
+
+}
+
+export const renewPassword = async (req: RequestJwt, res: Response): Promise<void> => {
 
     res.json({
         msg: 'Renew'

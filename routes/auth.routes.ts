@@ -3,6 +3,8 @@ import { check } from "express-validator";
 
 import { loginUser, registerUser, renewPassword, emailConfirmation } from '../controllers/auth.controllers';
 import fieldsValidate from '../middlewares/fieldsValidate';
+import validateJwt from '../middlewares/jwtValidate';
+
 
 const router = Router();
 
@@ -21,6 +23,6 @@ router.post('/register', [
 ],registerUser);
 
 router.get('/renew', renewPassword);
-router.get('/emailconfirmation', emailConfirmation);
+router.get('/emailconfirmation', validateJwt, emailConfirmation);
 
 export default router;

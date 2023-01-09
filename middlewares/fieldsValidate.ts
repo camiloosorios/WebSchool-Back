@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 
 
-const fieldsValidate = (req: Request, res: Response, next: NextFunction) => {
+const fieldsValidate = (req: Request, res: Response, next: NextFunction): (Response | void) => {
 
     const errors = validationResult(req);
 

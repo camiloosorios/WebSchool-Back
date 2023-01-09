@@ -7,6 +7,7 @@ const express_1 = require("express");
 const express_validator_1 = require("express-validator");
 const auth_controllers_1 = require("../controllers/auth.controllers");
 const fieldsValidate_1 = __importDefault(require("../middlewares/fieldsValidate"));
+const jwtValidate_1 = __importDefault(require("../middlewares/jwtValidate"));
 const router = (0, express_1.Router)();
 router.post('/login', [
     (0, express_validator_1.check)('email', 'Correo Electrónico Inválido').isEmail(),
@@ -21,6 +22,6 @@ router.post('/register', [
     fieldsValidate_1.default
 ], auth_controllers_1.registerUser);
 router.get('/renew', auth_controllers_1.renewPassword);
-router.get('/emailconfirmation', auth_controllers_1.emailConfirmation);
+router.get('/emailconfirmation', jwtValidate_1.default, auth_controllers_1.emailConfirmation);
 exports.default = router;
 //# sourceMappingURL=auth.routes.js.map

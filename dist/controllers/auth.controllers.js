@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.renewPassword = exports.emailConfirmation = exports.registerUser = exports.loginUser = void 0;
+exports.renewPassword = exports.emailConfirmation = exports.renewToken = exports.registerUser = exports.loginUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_1 = __importDefault(require("../models/user"));
 const sendEmail_1 = __importDefault(require("../helpers/sendEmail"));
@@ -107,13 +107,23 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.registerUser = registerUser;
-const emailConfirmation = (req, res) => {
-    const { token } = req.query;
-    console.log(token);
-    return res.json({
-        token
-    });
+const renewToken = (req, res) => {
 };
+exports.renewToken = renewToken;
+const emailConfirmation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //obtenemos el id del usuario
+    const id = req.id;
+    //Obtenemos el usuario a actualizar
+    const user = yield user_1.default.findByPk(id);
+    if (user) {
+        //Actualizamos el estado a verificado
+        user.set('verified', true);
+        yield user.save();
+        return res.json({
+            msg: 'Cuenta Verificada'
+        });
+    }
+});
 exports.emailConfirmation = emailConfirmation;
 const renewPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json({
