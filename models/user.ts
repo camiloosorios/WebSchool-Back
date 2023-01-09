@@ -14,6 +14,14 @@ const User = database.define('user', {
   password: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  image: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 
 });

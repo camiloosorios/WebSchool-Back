@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
-import emailTemplate from "./templates/email.template";
+import emailTemplate from "./email.template";
 
-const sendMail = (name: string, email: string) => {
+const sendMail = async(name: string, email: string, jwt: string) => {
     let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
@@ -16,10 +16,10 @@ const sendMail = (name: string, email: string) => {
         }
     });
     
-    transporter.sendMail({
+    await transporter.sendMail({
       to: email,
-      subject: "Bienvenido a Webschool",
-      html: emailTemplate(name)
+      subject: "Registro Webschool",
+      html: emailTemplate(name, jwt)
     });
 
     

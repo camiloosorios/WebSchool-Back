@@ -1,5 +1,5 @@
 
-const emailTemplate =  (name: string) => {
+const emailTemplate =  (name: string, jwt: string) => {
     return  `
 
     <!DOCTYPE html>
@@ -23,17 +23,13 @@ const emailTemplate =  (name: string) => {
             >Ya casi esta lista tu cuenta, solo falta que confirmes tu dirección de correo electrónico dando click en el botón de confirmar.
         </p>
         <br>
-        <div style="display: grid; justify-items: center;">
-            <button style=" background-color: blueviolet; 
-                            color: white; font-weight: bold; 
-                            text-align: center;
-                            cursor: pointer;
-                            border: none;
-                            border-radius: 5px;
-                            height: 30px
-                            width: fit-content;"
-                >CONFIRMAR CUENTA
-            </button>
+        <div style="display: grid;">
+            <a  href="http://localhost:8080/auth/emailconfirmation?token=${jwt}" 
+                style=" color: white; font-weight: bolder; 
+                        text-align: center;
+                        cursor: pointer;                        
+                        text-decoration: none;"
+            ><strong style=" font-weight: bolder; border-radius: 5px; background-color: blueviolet; padding: 10px;">Confirmar cuenta</strong></a>
         </div>
         <br>
         <p style="text-align: center;"
@@ -45,5 +41,6 @@ const emailTemplate =  (name: string) => {
             `;
 }
 
+//http://localhost:4200/dashboard
 
 export default emailTemplate;

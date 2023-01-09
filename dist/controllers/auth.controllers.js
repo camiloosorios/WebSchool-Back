@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.renewPassword = exports.registerUser = exports.loginUser = void 0;
+exports.renewPassword = exports.emailConfirmation = exports.registerUser = exports.loginUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_1 = __importDefault(require("../models/user"));
 const sendEmail_1 = __importDefault(require("../helpers/sendEmail"));
+const jwtGenerate_1 = __importDefault(require("../helpers/jwtGenerate"));
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //Desestructuramos el correo y contraseña del body
     const { email, password } = req.body;
@@ -39,11 +40,16 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 msg: 'Usuario o Contraseña incorrecta'
             });
         }
-        else {
-            return res.json({
-                msg: 'Login'
-            });
-        }
+        const payload = {
+            id: user.getDataValue('id'),
+            email
+        };
+        //Generamos token
+        const token = (0, jwtGenerate_1.default)(payload, process.env.SECRET_KEY);
+        return res.json({
+            msg: 'Login',
+            token
+        });
     }
     catch (error) {
         console.log(error);
@@ -80,9 +86,17 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             password: passEncripted,
             role
         });
-        (0, sendEmail_1.default)(name, email);
+        const payload = {
+            id: user.getDataValue('id'),
+            email
+        };
+        //Generamos el token con la data a enviar en el correo
+        const token = (0, jwtGenerate_1.default)(payload, process.env.SECRET_KEY);
+        //Enviamos el correo
+        (0, sendEmail_1.default)(name, email, token);
         return res.json({
-            msg: 'Usuario creado correctamente'
+            msg: 'Usuario creado correctamente',
+            token
         });
     }
     catch (error) {
@@ -93,6 +107,14 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.registerUser = registerUser;
+const emailConfirmation = (req, res) => {
+    const { token } = req.query;
+    console.log(token);
+    return res.json({
+        token
+    });
+};
+exports.emailConfirmation = emailConfirmation;
 const renewPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json({
         msg: 'Renew'

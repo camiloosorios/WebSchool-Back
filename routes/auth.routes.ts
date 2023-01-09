@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { check } from "express-validator";
 
-import { loginUser, registerUser, renewPassword } from "../controllers/auth.controllers";
-import fieldsValidate from '../helpers/fieldsValidate';
+import { loginUser, registerUser, renewPassword, emailConfirmation } from '../controllers/auth.controllers';
+import fieldsValidate from '../middlewares/fieldsValidate';
 
 const router = Router();
 
@@ -21,5 +21,6 @@ router.post('/register', [
 ],registerUser);
 
 router.get('/renew', renewPassword);
+router.get('/emailconfirmation', emailConfirmation);
 
 export default router;

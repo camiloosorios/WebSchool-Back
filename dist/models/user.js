@@ -18,6 +18,14 @@ const User = connection_1.default.define('user', {
     password: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false
+    },
+    verified: {
+        type: sequelize_1.DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    image: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true
     }
 });
 exports.default = User;

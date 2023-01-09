@@ -3,6 +3,8 @@ import bcryptjs from "bcryptjs";
 
 import User from '../models/user';
 import sendEmail from "../helpers/sendEmail";
+import generateToken from "../helpers/jwtGenerate";
+import { JsonWebTokenPayload } from '../interfaces/jwt.interface';
 
 
 export const loginUser = async (req: Request, res: Response): Promise<Response> => {
@@ -33,12 +35,22 @@ export const loginUser = async (req: Request, res: Response): Promise<Response> 
         if(!validPass) {
             return res.status(400).json({
                 msg: 'Usuario o Contraseña incorrecta'
-            })
-        } else {
-            return res.json({
-                msg: 'Login'
-            })
+            });
+        } 
+
+        const payload : JsonWebTokenPayload = {
+            id: user.getDataValue('id'),
+            email
         }
+
+        //Generamos token
+        const token = generateToken(payload, process.env.SECRET_KEY!);
+
+        return res.json({
+            msg: 'Login',
+            token
+
+        })
 
         
     } catch (error) {
@@ -82,6 +94,7 @@ export const registerUser = async (req: Request, res: Response): Promise<Respons
         //Encriptamos la contraseña
         const passEncripted = bcryptjs.hashSync(password, salt);
 
+        
         //Guardamos usuario en base de datos
         const user = await User.create({
             name,
@@ -89,11 +102,21 @@ export const registerUser = async (req: Request, res: Response): Promise<Respons
             password: passEncripted,
             role
         });
+        
+        const payload: JsonWebTokenPayload = {
+            id: user.getDataValue('id'),
+            email
+        }
+        
+        //Generamos el token con la data a enviar en el correo
+        const token = generateToken(payload, process.env.SECRET_KEY!);
 
-        sendEmail(name, email);
+        //Enviamos el correo
+        sendEmail(name, email, token);
 
         return res.json({
-            msg: 'Usuario creado correctamente'
+            msg: 'Usuario creado correctamente',
+            token
         })
         
     } catch (error) {
@@ -105,6 +128,17 @@ export const registerUser = async (req: Request, res: Response): Promise<Respons
     }
 
 
+}
+
+export const emailConfirmation = (req: Request, res: Response) => {
+    const { token } = req.query;
+
+    console.log(token);
+    
+
+    return res.json({
+        token
+    })
 }
 
 export const renewPassword = async (req: Request, res: Response): Promise<void> => {
