@@ -2,7 +2,7 @@ import { Response } from "express";
 import bcryptjs from "bcryptjs";
 
 import User from '../models/user';
-import sendEmail from "../helpers/sendEmail";
+import { confirmEmail, changePassword } from '../helpers/sendEmail';
 import generateToken from "../helpers/jwtGenerate";
 import { JsonWebTokenPayload } from '../interfaces/jwt.interface';
 import { RequestJwt } from "../interfaces/request.interface";
@@ -40,8 +40,7 @@ export const loginUser = async (req: RequestJwt, res: Response): Promise<Respons
         } 
 
         const payload : JsonWebTokenPayload = {
-            id: user.getDataValue('id'),
-            email
+            id: user.getDataValue('id')
         }
 
         //Generamos token
@@ -58,12 +57,11 @@ export const loginUser = async (req: RequestJwt, res: Response): Promise<Respons
         console.log(error);
 
         return res.status(500).json({
-            msg: 'Error, comuniquese con un Administrador'
+            msg: 'Error, comuniquese con un Administrador',
+            token: ''
         });
         
     }
-
-    
 
 }
 
@@ -85,7 +83,8 @@ export const registerUser = async (req: RequestJwt, res: Response): Promise<Resp
         if(existEmail) {
 
             return res.status(400).json({
-                msg: 'El Correo Electrónico ya ha sido tomado por otro usuario'
+                msg: 'El Correo Electrónico ya ha sido tomado por otro usuario',
+                token: ''
             })
         }
 
@@ -105,15 +104,14 @@ export const registerUser = async (req: RequestJwt, res: Response): Promise<Resp
         });
         
         const payload: JsonWebTokenPayload = {
-            id: user.getDataValue('id'),
-            email
+            id: user.getDataValue('id')
         }
         
         //Generamos el token con la data a enviar en el correo
         const token = generateToken(payload, process.env.SECRET_KEY!);
 
         //Enviamos el correo
-        sendEmail(name, email, token);
+        confirmEmail(name, email, token);
 
         return res.json({
             msg: 'Usuario creado correctamente',
@@ -124,42 +122,160 @@ export const registerUser = async (req: RequestJwt, res: Response): Promise<Resp
         console.log(error);
 
         return res.status(500).json({
-            msg: 'Error, comuniquese con un Administrador'
+            msg: 'Error, comuniquese con un Administrador',
+            token: ''
         });                
     }
 
 
 }
 
-export const renewToken = (req: RequestJwt, res: Response) => {
+export const renewToken = (req: RequestJwt, res: Response): Response => {
+
+    //Obtenemos el id del usuario
+    const id = req.id;
+
+    //Configuramos el payload
+    const payload: JsonWebTokenPayload = {
+        id: Number(id)
+    }
+
+    //Renovamos el token
+    const token = generateToken(payload, process.env.SECRET_KEY!);
+
+    //Retornamos el nuevo token
+    return res.json({
+        msg: 'Token renovado',
+        token
+    })
 
 }
 
-export const emailConfirmation = async(req: RequestJwt, res: Response) => {
+export const emailConfirmation = async (req: RequestJwt, res: Response): Promise<Response> => {
     
     //obtenemos el id del usuario
     const id = req.id;
-    
-    //Obtenemos el usuario a actualizar
-    const user = await User.findByPk(id);
- 
-    if(user) {
 
-        //Actualizamos el estado a verificado
-        user.set('verified', true);
-        await user.save();
+    try {
+        //Obtenemos el usuario a actualizar
+        const user = await User.findByPk(id);
+     
+        if(!user) {
     
+           return res.status(401).json({
+                msg: 'El usuario no existe',
+                token: ''
+           })
+        }
+
+         //Actualizamos el estado a verificado
+         user.set('verified', true);
+         await user.save();
+     
+         return res.json({
+             msg: 'Cuenta Verificada',
+             token: ''
+         });
+
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            msg: 'Error, comuniquese con un Administrador',
+            token: ''
+        });
+        
+    }
+    
+
+}
+
+export const renewPassword = async (req: RequestJwt, res: Response): Promise<Response> => {
+
+    const { email } = req.query;
+
+    try {
+
+        const emailExist = await User.findOne({
+            where:{ email }
+        });
+
+        if(!emailExist){
+            return res.status(401).json({
+                msg: 'Correo Electrónico incorrecto',
+                token: ''
+            });
+        }        
+
+        const payload: JsonWebTokenPayload = {
+            id: emailExist.getDataValue('id')
+        }
+
+        const name: string = emailExist.getDataValue('name');
+        
+        //Generamos el token con la data a enviar en el correo
+        const token: string = generateToken(payload, process.env.SECRET_KEY!);
+
+        //Enviamos el correo
+        changePassword(name, String(email), token);
+
         return res.json({
-            msg: 'Cuenta Verificada'
+            msg: `Se envio correo para actualizar contraseña a la dirección "${email}"`,
+            token: ''
+        })
+        
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            msg: 'Error, comuniquese con un Administrador',
+            token: ''
         });
     }
 
 }
 
-export const renewPassword = async (req: RequestJwt, res: Response): Promise<void> => {
+export const updatePassword = async(req: RequestJwt, res: Response): Promise<Response> => {
 
-    res.json({
-        msg: 'Renew'
-    });
+    //Obtenemos el id y la contraseña de la request
+    const id = req.id;
+    const { password } = req.body;
+
+    try {
+
+        //buscamos el usuario con el id correspondiente
+        const user = await User.findByPk(id);
+
+        if(!user) {
+            return res.json({
+                msg: `El usuario con id: ${id} no existe`,
+                token: ''
+            });
+        }
+
+        //Generamos el salt
+        const salt = bcryptjs.genSaltSync();
+
+        //Encriptamos la contraseña
+        const pass = bcryptjs.hashSync(password, salt);
+
+        //Actualizamos la contraseña en la base de datos
+        user.set('password', pass);
+        await user.save();
+
+        return res.json({
+            msg: 'Contraseña actualizada correctamente',
+            token: ''
+        })
+        
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            msg: 'Error, comuniquese con un Administrador',
+            token: ''
+        });
+        
+    }
 
 }

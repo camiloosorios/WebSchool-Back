@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { check } from "express-validator";
 
-import { loginUser, registerUser, renewPassword, emailConfirmation } from '../controllers/auth.controllers';
+import { loginUser, registerUser, renewPassword, emailConfirmation, updatePassword } from '../controllers/auth.controllers';
 import fieldsValidate from '../middlewares/fieldsValidate';
 import validateJwt from '../middlewares/jwtValidate';
 
@@ -22,7 +22,14 @@ router.post('/register', [
     fieldsValidate
 ],registerUser);
 
-router.get('/renew', renewPassword);
 router.get('/emailconfirmation', validateJwt, emailConfirmation);
+
+router.get('/renew', validateJwt, renewPassword);
+
+router.put('/updatepassword', [
+    check('password', 'La contraseña debe tener min. 6 caractéres').isLength({ min:6 }),
+    fieldsValidate,
+    validateJwt
+], updatePassword);
 
 export default router;

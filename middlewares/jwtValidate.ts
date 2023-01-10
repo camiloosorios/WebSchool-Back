@@ -8,6 +8,7 @@ const validateJwt = (req: RequestJwt, res:Response, next: NextFunction): (Respon
 
     const token = req.query.token || null;
 
+    //Validamos que el token venga en la url
     if(token == null){
         return res.status(401).json({
             msg: 'El token es requerido'
@@ -15,10 +16,13 @@ const validateJwt = (req: RequestJwt, res:Response, next: NextFunction): (Respon
     }   
 
     try {
+        //Validamos que el token sea válido
         const payload = jwt.verify(String(token), process.env.SECRET_KEY!) as JsonWebTokenPayload;
         
+        //asignamos el token en la request
         req.id = payload.id;
         
+        //Pasamos al siguiente middleware
         next();
 
     } catch (error) {
