@@ -154,7 +154,7 @@ const emailConfirmation = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.emailConfirmation = emailConfirmation;
 const renewPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email } = req.query;
+    const { email } = req.body;
     try {
         const emailExist = yield user_1.default.findOne({
             where: { email }

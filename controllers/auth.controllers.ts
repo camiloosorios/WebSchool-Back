@@ -192,7 +192,7 @@ export const emailConfirmation = async (req: RequestJwt, res: Response): Promise
 
 export const renewPassword = async (req: RequestJwt, res: Response): Promise<Response> => {
 
-    const { email } = req.query;
+    const { email } = req.body;
 
     try {
 

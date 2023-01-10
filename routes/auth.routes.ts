@@ -24,7 +24,10 @@ router.post('/register', [
 
 router.get('/emailconfirmation', validateJwt, emailConfirmation);
 
-router.get('/renew', validateJwt, renewPassword);
+router.post('/renew', [
+    check('email', 'Correo Electrónico Inválido').isEmail(),
+    fieldsValidate
+], renewPassword);
 
 router.put('/updatepassword', [
     check('password', 'La contraseña debe tener min. 6 caractéres').isLength({ min:6 }),

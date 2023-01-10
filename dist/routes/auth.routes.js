@@ -22,7 +22,10 @@ router.post('/register', [
     fieldsValidate_1.default
 ], auth_controllers_1.registerUser);
 router.get('/emailconfirmation', jwtValidate_1.default, auth_controllers_1.emailConfirmation);
-router.get('/renew', jwtValidate_1.default, auth_controllers_1.renewPassword);
+router.post('/renew', [
+    (0, express_validator_1.check)('email', 'Correo Electrónico Inválido').isEmail(),
+    fieldsValidate_1.default
+], auth_controllers_1.renewPassword);
 router.put('/updatepassword', [
     (0, express_validator_1.check)('password', 'La contraseña debe tener min. 6 caractéres').isLength({ min: 6 }),
     fieldsValidate_1.default,
