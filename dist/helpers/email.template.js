@@ -69,7 +69,7 @@ const renewPasswordHtml = (name, jwt) => {
         </p>
         <br>
         <div style="display: grid;">
-            <a  href="http://localhost:8080/auth/renewPassword?token=${jwt}" 
+            <a  href="http://localhost:4200/auth/update?token=${jwt}" 
                 style=" color: white; font-weight: bolder; 
                         text-align: center;
                         cursor: pointer;                        
